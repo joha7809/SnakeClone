@@ -6,20 +6,6 @@ using System.Collections.Generic;
 
 namespace SnakeClone
 {
-    public class SnakePart
-    {
-        public Point position;
-        public UIElement uiElement;
-        public bool isHead;
-        
-
-        public SnakePart(Point position, UIElement uiElement, bool isHead)
-        {
-            this.position = position;
-            this.uiElement = uiElement;
-            this.isHead = isHead;
-        }
-    }
 
     public class Snake
     {
@@ -29,6 +15,8 @@ namespace SnakeClone
         public List<SnakePart> snake = new List<SnakePart>();
         public int length;
 
+        private static bool addFood = false;
+        private static Point foodPosition = (new Point(-1, -1));
         public enum Directions { Left, Right, Up, Down };
         public Directions directions = Directions.Right;
 
@@ -52,11 +40,29 @@ namespace SnakeClone
 
         public bool CollisionCheck()
         {
-            if (snake[0].position.X > MainWindow.tile-1 || snake[0].position.X < 0 || snake[0].position.Y > MainWindow.tile-1 || snake[0].position.Y < 0)
+            if (snake[0].position.X > GameManager.tile-1 || snake[0].position.X < 0 || snake[0].position.Y > GameManager.tile-1 || snake[0].position.Y < 0)
             {
                 return true;
             }
             return false;
+        }
+
+        public void CollisionWithFood()
+        {
+            int i = 0;
+            foreach (var food in Food.foods)
+            {
+                if (snake[snake.Count-1].position.Equals(food.position))
+                {
+                    addFood = !addFood;
+                    foodPosition = food.position;
+                    Food.DeleteFood(i);
+
+
+                    break;
+                }
+                i++;
+            }
         }
 
         public void DrawSnake(Canvas GameBoard)
@@ -67,24 +73,29 @@ namespace SnakeClone
                 {
                     snakePart.uiElement = new Rectangle
                     {
-                        Width = MainWindow.tileSize,
-                        Height = MainWindow.tileSize,
+                        Width = GameManager.tileSize,
+                        Height = GameManager.tileSize,
                         Fill = snakePart.isHead ? snakeBodyColor : snakeHeadColor
                     };
                     
                     GameBoard.Children.Add(snakePart.uiElement);
-                    Canvas.SetLeft(snakePart.uiElement, snakePart.position.X * MainWindow.tileSize);
-                    Canvas.SetTop(snakePart.uiElement, snakePart.position.Y * MainWindow.tileSize);
+                    Canvas.SetLeft(snakePart.uiElement, snakePart.position.X * GameManager.tileSize);
+                    Canvas.SetTop(snakePart.uiElement, snakePart.position.Y * GameManager.tileSize);
                 }
             }
         }
 
         public void Move(Canvas GameBoard)
         {
+            if (addFood)
+            {
+                snake.Add(new SnakePart(new Point(foodPosition.X, foodPosition.Y), null, false));
+                addFood = !addFood;
+                foodPosition = new Point(-1, -1);
+            }
+
             int nextX = 0;
             int nextY = 0;
-
-            
 
             switch (directions)
             {
@@ -123,7 +134,6 @@ namespace SnakeClone
                 true
             ));
 
-            
             foreach (SnakePart snakePartCopy in snakeCopy)
             {
                 snake.Add(snakePartCopy);
@@ -136,8 +146,8 @@ namespace SnakeClone
                 { //Create new Rectangle to display the snakepart
                     snakePart.uiElement = new Rectangle
                     {
-                        Width = MainWindow.tileSize,
-                        Height = MainWindow.tileSize,
+                        Width = GameManager.tileSize,
+                        Height = GameManager.tileSize,
                         Fill = snakePart.isHead ? snakeBodyColor : snakeHeadColor
                     };
 
@@ -145,8 +155,8 @@ namespace SnakeClone
                 }
 
                 //sets the position of the snakepart
-                Canvas.SetLeft(snakePart.uiElement, (snakePart.position.X) * MainWindow.tileSize);
-                Canvas.SetTop(snakePart.uiElement, (snakePart.position.Y) * MainWindow.tileSize);
+                Canvas.SetLeft(snakePart.uiElement, (snakePart.position.X) * GameManager.tileSize);
+                Canvas.SetTop(snakePart.uiElement, (snakePart.position.Y) * GameManager.tileSize);
             }
         }
     }

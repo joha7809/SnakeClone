@@ -10,7 +10,7 @@
 		ContentRendered="Window_ContentRendered"
         KeyUp="Window_KeyUp">
 	<Border BorderBrush="Black" BorderThickness="5">
-        <Canvas Name="GameBoard" ClipToBounds="True" Height="500" Width="500" Visibility="Hidden">
+        <Canvas Name="GameBoard" ClipToBounds="True" Height="500" Width="500">
 
         </Canvas>
     </Border>
